@@ -1,0 +1,3463 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.dmg.org/PMML-4_2" elementFormDefault="unqualified" targetNamespace="http://www.dmg.org/PMML-4_2">
+	<xsd:element name="DefineFunction">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="ParameterField" minOccurs="1" maxOccurs="unbounded"/>
+				<xsd:group ref="EXPRESSION"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="optype" type="OPTYPE" use="required"/>
+			<xsd:attribute name="dataType" type="DATATYPE"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ParameterField">
+		<xsd:complexType>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="optype" type="OPTYPE"/>
+			<xsd:attribute name="dataType" type="DATATYPE"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Apply">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="EXPRESSION" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="function" type="xsd:string" use="required"/>
+			<xsd:attribute name="mapMissingTo" type="xsd:string"/>
+			<xsd:attribute name="defaultValue" type="xsd:string"/>
+			<xsd:attribute name="invalidValueTreatment" type="INVALID-VALUE-TREATMENT-METHOD" default="returnInvalid"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="MiningModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:choice minOccurs="0" maxOccurs="unbounded">
+					<xsd:element ref="Regression"/>
+					<xsd:element ref="DecisionTree"/>
+				</xsd:choice>
+				<xsd:element ref="Segmentation" minOccurs="0"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Segmentation">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Segment" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="multipleModelMethod" type="MULTIPLE-MODEL-METHOD" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Segment">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="PREDICATE"/>
+				<xsd:group ref="MODEL-ELEMENT"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:string" use="optional"/>
+			<xsd:attribute name="weight" type="NUMBER" use="optional" default="1"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="MULTIPLE-MODEL-METHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="majorityVote"/>
+			<xsd:enumeration value="weightedMajorityVote"/>
+			<xsd:enumeration value="average"/>
+			<xsd:enumeration value="weightedAverage"/>
+			<xsd:enumeration value="median"/>
+			<xsd:enumeration value="max"/>
+			<xsd:enumeration value="sum"/>
+			<xsd:enumeration value="selectFirst"/>
+			<xsd:enumeration value="selectAll"/>
+			<xsd:enumeration value="modelChain"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:group name="EmbeddedModel">
+		<xsd:sequence>
+			<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:choice>
+				<xsd:element ref="Regression"/>
+				<xsd:element ref="DecisionTree"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="ResultField">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="displayName" type="xsd:string"/>
+			<xsd:attribute name="optype" type="OPTYPE"/>
+			<xsd:attribute name="dataType" type="DATATYPE"/>
+			<xsd:attribute name="feature" type="RESULT-FEATURE"/>
+			<xsd:attribute name="value" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Regression">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="ResultField" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="RegressionTable" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="normalizationMethod" type="REGRESSIONNORMALIZATIONMETHOD" default="none"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="DecisionTree">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="ResultField" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Node"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="missingValueStrategy" type="MISSING-VALUE-STRATEGY" default="none"/>
+			<xsd:attribute name="missingValuePenalty" type="PROB-NUMBER" default="1.0"/>
+			<xsd:attribute name="noTrueChildStrategy" type="NO-TRUE-CHILD-STRATEGY" default="returnNullPrediction"/>
+			<xsd:attribute name="splitCharacteristic" default="multiSplit">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="binarySplit"/>
+						<xsd:enumeration value="multiSplit"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="AssociationModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="Item" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Itemset" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="AssociationRule" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="numberOfTransactions" type="INT-NUMBER" use="required"/>
+			<xsd:attribute name="maxNumberOfItemsPerTA" type="INT-NUMBER"/>
+			<xsd:attribute name="avgNumberOfItemsPerTA" type="REAL-NUMBER"/>
+			<xsd:attribute name="minimumSupport" type="PROB-NUMBER" use="required"/>
+			<xsd:attribute name="minimumConfidence" type="PROB-NUMBER" use="required"/>
+			<xsd:attribute name="lengthLimit" type="INT-NUMBER"/>
+			<xsd:attribute name="numberOfItems" type="INT-NUMBER" use="required"/>
+			<xsd:attribute name="numberOfItemsets" type="INT-NUMBER" use="required"/>
+			<xsd:attribute name="numberOfRules" type="INT-NUMBER" use="required"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Item">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:string" use="required"/>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+			<xsd:attribute name="mappedValue" type="xsd:string"/>
+			<xsd:attribute name="weight" type="REAL-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Itemset">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="ItemRef"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:string" use="required"/>
+			<xsd:attribute name="support" type="PROB-NUMBER"/>
+			<xsd:attribute name="numberOfItems" type="xsd:nonNegativeInteger"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ItemRef">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="itemRef" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="AssociationRule">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="antecedent" type="xsd:string" use="required"/>
+			<xsd:attribute name="consequent" type="xsd:string" use="required"/>
+			<xsd:attribute name="support" type="PROB-NUMBER" use="required"/>
+			<xsd:attribute name="confidence" type="PROB-NUMBER" use="required"/>
+			<xsd:attribute name="lift" type="xsd:float" use="optional"/>
+			<xsd:attribute name="leverage" type="xsd:float" use="optional"/>
+			<xsd:attribute name="affinity" type="PROB-NUMBER" use="optional"/>
+			<xsd:attribute name="id" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="RuleSetModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="RuleSet"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="RuleSet">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="RuleSelectionMethod" minOccurs="1" maxOccurs="unbounded"/>
+				<xsd:element ref="ScoreDistribution" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="Rule" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="recordCount" type="NUMBER" use="optional"/>
+			<xsd:attribute name="nbCorrect" type="NUMBER" use="optional"/>
+			<xsd:attribute name="defaultScore" type="xsd:string" use="optional"/>
+			<xsd:attribute name="defaultConfidence" type="NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="RuleSelectionMethod">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="criterion" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="weightedSum"/>
+						<xsd:enumeration value="weightedMax"/>
+						<xsd:enumeration value="firstHit"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="Rule">
+		<xsd:choice>
+			<xsd:element ref="SimpleRule"/>
+			<xsd:element ref="CompoundRule"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:element name="SimpleRule">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="PREDICATE"/>
+				<xsd:element ref="ScoreDistribution" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:string" use="optional"/>
+			<xsd:attribute name="score" type="xsd:string" use="required"/>
+			<xsd:attribute name="recordCount" type="NUMBER" use="optional"/>
+			<xsd:attribute name="nbCorrect" type="NUMBER" use="optional"/>
+			<xsd:attribute name="confidence" type="NUMBER" use="optional" default="1"/>
+			<xsd:attribute name="weight" type="NUMBER" use="optional" default="1"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="CompoundRule">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="PREDICATE"/>
+				<xsd:group ref="Rule" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ClusteringModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="ComparisonMeasure"/>
+				<xsd:element ref="ClusteringField" minOccurs="1" maxOccurs="unbounded"/>
+				<xsd:element ref="MissingValueWeights" minOccurs="0"/>
+				<xsd:element ref="Cluster" maxOccurs="unbounded"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="modelClass" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="centerBased"/>
+						<xsd:enumeration value="distributionBased"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="numberOfClusters" type="INT-NUMBER" use="required"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="MissingValueWeights">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="NUM-ARRAY"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Cluster">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="KohonenMap" minOccurs="0"/>
+				<xsd:group ref="NUM-ARRAY" minOccurs="0"/>
+				<xsd:element ref="Partition" minOccurs="0"/>
+				<xsd:element ref="Covariances" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:string" use="optional"/>
+			<xsd:attribute name="name" type="xsd:string" use="optional"/>
+			<xsd:attribute name="size" type="xsd:nonNegativeInteger" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="KohonenMap">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="coord1" type="xsd:float" use="optional"/>
+			<xsd:attribute name="coord2" type="xsd:float" use="optional"/>
+			<xsd:attribute name="coord3" type="xsd:float" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Covariances">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Matrix"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ClusteringField">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Comparisons" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="isCenterField" default="true">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="true"/>
+						<xsd:enumeration value="false"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="fieldWeight" type="REAL-NUMBER" default="1"/>
+			<xsd:attribute name="similarityScale" type="REAL-NUMBER" use="optional"/>
+			<xsd:attribute name="compareFunction" type="COMPARE-FUNCTION" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Comparisons">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Matrix"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="COMPARE-FUNCTION">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="absDiff"/>
+			<xsd:enumeration value="gaussSim"/>
+			<xsd:enumeration value="delta"/>
+			<xsd:enumeration value="equal"/>
+			<xsd:enumeration value="table"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="ComparisonMeasure">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:choice>
+					<xsd:element ref="euclidean"/>
+					<xsd:element ref="squaredEuclidean"/>
+					<xsd:element ref="chebychev"/>
+					<xsd:element ref="cityBlock"/>
+					<xsd:element ref="minkowski"/>
+					<xsd:element ref="simpleMatching"/>
+					<xsd:element ref="jaccard"/>
+					<xsd:element ref="tanimoto"/>
+					<xsd:element ref="binarySimilarity"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="kind" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="distance"/>
+						<xsd:enumeration value="similarity"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="compareFunction" type="COMPARE-FUNCTION" default="absDiff"/>
+			<xsd:attribute name="minimum" type="NUMBER" use="optional"/>
+			<xsd:attribute name="maximum" type="NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="euclidean">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="squaredEuclidean">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="cityBlock">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="chebychev">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="minkowski">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="p-parameter" type="NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="simpleMatching">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="jaccard">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="tanimoto">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="binarySimilarity">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="c00-parameter" type="NUMBER" use="required"/>
+			<xsd:attribute name="c01-parameter" type="NUMBER" use="required"/>
+			<xsd:attribute name="c10-parameter" type="NUMBER" use="required"/>
+			<xsd:attribute name="c11-parameter" type="NUMBER" use="required"/>
+			<xsd:attribute name="d00-parameter" type="NUMBER" use="required"/>
+			<xsd:attribute name="d01-parameter" type="NUMBER" use="required"/>
+			<xsd:attribute name="d10-parameter" type="NUMBER" use="required"/>
+			<xsd:attribute name="d11-parameter" type="NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="RegressionModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="RegressionTable" maxOccurs="unbounded"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="modelType" use="optional">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="linearRegression"/>
+						<xsd:enumeration value="stepwisePolynomialRegression"/>
+						<xsd:enumeration value="logisticRegression"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="targetFieldName" type="FIELD-NAME" use="optional"/>
+			<xsd:attribute name="normalizationMethod" type="REGRESSIONNORMALIZATIONMETHOD" default="none"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="REGRESSIONNORMALIZATIONMETHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="simplemax"/>
+			<xsd:enumeration value="softmax"/>
+			<xsd:enumeration value="logit"/>
+			<xsd:enumeration value="probit"/>
+			<xsd:enumeration value="cloglog"/>
+			<xsd:enumeration value="exp"/>
+			<xsd:enumeration value="loglog"/>
+			<xsd:enumeration value="cauchit"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="RegressionTable">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="NumericPredictor" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="CategoricalPredictor" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="PredictorTerm" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="intercept" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="targetCategory" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NumericPredictor">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="exponent" type="INT-NUMBER" default="1"/>
+			<xsd:attribute name="coefficient" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="CategoricalPredictor">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+			<xsd:attribute name="coefficient" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PredictorTerm">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="FieldRef" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME"/>
+			<xsd:attribute name="coefficient" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TextModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="TextDictionary"/>
+				<xsd:element ref="TextCorpus"/>
+				<xsd:element ref="DocumentTermMatrix"/>
+				<xsd:element ref="TextModelNormalization" minOccurs="0"/>
+				<xsd:element ref="TextModelSimiliarity" minOccurs="0"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="numberOfTerms" type="xsd:integer" use="required"/>
+			<xsd:attribute name="numberOfDocuments" type="xsd:integer" use="required"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TextDictionary">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Taxonomy" minOccurs="0"/>
+				<xsd:group ref="STRING-ARRAY"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TextCorpus">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="TextDocument" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TextDocument">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:string" use="required"/>
+			<xsd:attribute name="name" type="xsd:string" use="optional"/>
+			<xsd:attribute name="length" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="file" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="DocumentTermMatrix">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Matrix"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TextModelNormalization">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="localTermWeights" default="termFrequency">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="termFrequency"/>
+						<xsd:enumeration value="binary"/>
+						<xsd:enumeration value="logarithmic"/>
+						<xsd:enumeration value="augmentedNormalizedTermFrequency"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="globalTermWeights" default="inverseDocumentFrequency">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="inverseDocumentFrequency"/>
+						<xsd:enumeration value="none"/>
+						<xsd:enumeration value="GFIDF"/>
+						<xsd:enumeration value="normal"/>
+						<xsd:enumeration value="probabilisticInverse"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="documentNormalization" default="none">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="none"/>
+						<xsd:enumeration value="cosine"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TextModelSimiliarity">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="similarityType">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="euclidean"/>
+						<xsd:enumeration value="cosine"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NearestNeighborModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="TrainingInstances"/>
+				<xsd:element ref="ComparisonMeasure"/>
+				<xsd:element ref="KNNInputs"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="numberOfNeighbors" type="INT-NUMBER" use="required"/>
+			<xsd:attribute name="continuousScoringMethod" type="CONT-SCORING-METHOD" default="average"/>
+			<xsd:attribute name="categoricalScoringMethod" type="CAT-SCORING-METHOD" default="majorityVote"/>
+			<xsd:attribute name="instanceIdVariable" type="xsd:string"/>
+			<xsd:attribute name="threshold" type="REAL-NUMBER" default="0.001"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TrainingInstances">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="InstanceFields"/>
+				<xsd:choice>
+					<xsd:element ref="TableLocator"/>
+					<xsd:element ref="InlineTable"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="isTransformed" type="xsd:boolean" default="false"/>
+			<xsd:attribute name="recordCount" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="fieldCount" type="INT-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="InstanceFields">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="InstanceField" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="InstanceField">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="xsd:string" use="required"/>
+			<xsd:attribute name="column" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="KNNInputs">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="KNNInput" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="KNNInput">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="fieldWeight" type="REAL-NUMBER" default="1"/>
+			<xsd:attribute name="compareFunction" type="COMPARE-FUNCTION"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="CONT-SCORING-METHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="median"/>
+			<xsd:enumeration value="average"/>
+			<xsd:enumeration value="weightedAverage"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="CAT-SCORING-METHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="majorityVote"/>
+			<xsd:enumeration value="weightedMajorityVote"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="Targets">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Target" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Target">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="TargetValue" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="optype" type="OPTYPE"/>
+			<xsd:attribute name="castInteger">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="round"/>
+						<xsd:enumeration value="ceiling"/>
+						<xsd:enumeration value="floor"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="min" type="xsd:double"/>
+			<xsd:attribute name="max" type="xsd:double"/>
+			<xsd:attribute name="rescaleConstant" type="xsd:double" default="0"/>
+			<xsd:attribute name="rescaleFactor" type="xsd:double" default="1"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TargetValue">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Partition" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string"/>
+			<xsd:attribute name="displayValue" type="xsd:string"/>
+			<xsd:attribute name="priorProbability" type="PROB-NUMBER"/>
+			<xsd:attribute name="defaultValue" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PMML">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Header"/>
+				<xsd:element ref="MiningBuildTask" minOccurs="0"/>
+				<xsd:element ref="DataDictionary"/>
+				<xsd:element ref="TransformationDictionary" minOccurs="0"/>
+				<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+					<xsd:group ref="MODEL-ELEMENT"/>
+				</xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="version" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="MODEL-ELEMENT">
+		<xsd:choice>
+			<xsd:element ref="AssociationModel"/>
+			<xsd:element ref="BaselineModel"/>
+			<xsd:element ref="ClusteringModel"/>
+			<xsd:element ref="GeneralRegressionModel"/>
+			<xsd:element ref="MiningModel"/>
+			<xsd:element ref="NaiveBayesModel"/>
+			<xsd:element ref="NearestNeighborModel"/>
+			<xsd:element ref="NeuralNetwork"/>
+			<xsd:element ref="RegressionModel"/>
+			<xsd:element ref="RuleSetModel"/>
+			<xsd:element ref="SequenceModel"/>
+			<xsd:element ref="Scorecard"/>
+			<xsd:element ref="SupportVectorMachineModel"/>
+			<xsd:element ref="TextModel"/>
+			<xsd:element ref="TimeSeriesModel"/>
+			<xsd:element ref="TreeModel"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:element name="MiningBuildTask">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="MINING-FUNCTION">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="associationRules"/>
+			<xsd:enumeration value="sequences"/>
+			<xsd:enumeration value="classification"/>
+			<xsd:enumeration value="regression"/>
+			<xsd:enumeration value="clustering"/>
+			<xsd:enumeration value="timeSeries"/>
+			<xsd:enumeration value="mixed"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="Extension">
+		<xsd:complexType>
+			<xsd:complexContent mixed="true">
+				<xsd:restriction base="xsd:anyType">
+					<xsd:sequence>
+						<xsd:any processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+					<xsd:attribute name="extender" type="xsd:string" use="optional"/>
+					<xsd:attribute name="name" type="xsd:string" use="optional"/>
+					<xsd:attribute name="value" type="xsd:string" use="optional"/>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="NUMBER">
+		<xsd:restriction base="xsd:double"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="INT-NUMBER">
+		<xsd:restriction base="xsd:integer"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="REAL-NUMBER">
+		<xsd:restriction base="xsd:double"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="PROB-NUMBER">
+		<xsd:restriction base="xsd:decimal"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="PERCENTAGE-NUMBER">
+		<xsd:restriction base="xsd:decimal"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="FIELD-NAME">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:complexType name="ArrayType" mixed="true">
+		<xsd:attribute name="n" type="INT-NUMBER" use="optional"/>
+		<xsd:attribute name="type" use="required">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="int"/>
+					<xsd:enumeration value="real"/>
+					<xsd:enumeration value="string"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:element name="Array" type="ArrayType"/>
+	<xsd:group name="NUM-ARRAY">
+		<xsd:choice>
+			<xsd:element ref="Array"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="INT-ARRAY">
+		<xsd:choice>
+			<xsd:element ref="Array"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="REAL-ARRAY">
+		<xsd:choice>
+			<xsd:element ref="Array"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:group name="STRING-ARRAY">
+		<xsd:choice>
+			<xsd:element ref="Array"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:element name="INT-SparseArray">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Indices" minOccurs="0"/>
+				<xsd:element ref="INT-Entries" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="n" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="defaultValue" type="INT-NUMBER" use="optional" default="0"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="REAL-SparseArray">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Indices" minOccurs="0"/>
+				<xsd:element ref="REAL-Entries" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="n" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="defaultValue" type="REAL-NUMBER" use="optional" default="0"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Indices">
+		<xsd:simpleType>
+			<xsd:list itemType="xsd:int"/>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="INT-Entries">
+		<xsd:simpleType>
+			<xsd:list itemType="xsd:int"/>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="REAL-Entries">
+		<xsd:simpleType>
+			<xsd:list itemType="xsd:double"/>
+		</xsd:simpleType>
+	</xsd:element>
+	<xsd:element name="Matrix">
+		<xsd:complexType>
+			<xsd:choice minOccurs="0">
+				<xsd:group ref="NUM-ARRAY" maxOccurs="unbounded"/>
+				<xsd:element ref="MatCell" maxOccurs="unbounded"/>
+			</xsd:choice>
+			<xsd:attribute name="kind" use="optional" default="any">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="diagonal"/>
+						<xsd:enumeration value="symmetric"/>
+						<xsd:enumeration value="any"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="nbRows" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="nbCols" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="diagDefault" type="REAL-NUMBER" use="optional"/>
+			<xsd:attribute name="offDiagDefault" type="REAL-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="MatCell">
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:extension base="xsd:string">
+					<xsd:attribute name="row" type="INT-NUMBER" use="required"/>
+					<xsd:attribute name="col" type="INT-NUMBER" use="required"/>
+				</xsd:extension>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Header">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element minOccurs="0" ref="Application"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="Annotation"/>
+				<xsd:element minOccurs="0" ref="Timestamp"/>
+			</xsd:sequence>
+			<xsd:attribute name="copyright" type="xsd:string"/>
+			<xsd:attribute name="description" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Application">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="version" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Annotation">
+		<xsd:complexType mixed="true">
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Timestamp">
+		<xsd:complexType mixed="true">
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Taxonomy">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="ChildParent" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ChildParent">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="FieldColumnPair"/>
+				<xsd:choice>
+					<xsd:element ref="TableLocator"/>
+					<xsd:element ref="InlineTable"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="childField" type="xsd:string" use="required"/>
+			<xsd:attribute name="parentField" type="xsd:string" use="required"/>
+			<xsd:attribute name="parentLevelField" type="xsd:string" use="optional"/>
+			<xsd:attribute name="isRecursive" use="optional" default="no">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="no"/>
+						<xsd:enumeration value="yes"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TableLocator">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="InlineTable">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="row" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="row">
+		<xsd:complexType>
+			<xsd:complexContent mixed="true">
+				<xsd:restriction base="xsd:anyType">
+					<xsd:sequence>
+						<xsd:any processContents="skip" minOccurs="2" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:restriction>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NaiveBayesModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="BayesInputs"/>
+				<xsd:element ref="BayesOutput"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="threshold" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BayesInputs">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="BayesInput" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BayesInput">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:choice>
+					<xsd:element ref="TargetValueStats" minOccurs="1" maxOccurs="1"/>
+					<xsd:sequence>
+						<xsd:element ref="DerivedField" minOccurs="0" maxOccurs="1"/>
+						<xsd:element ref="PairCounts" minOccurs="1" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="fieldName" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BayesOutput">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="TargetValueCounts"/>
+			</xsd:sequence>
+			<xsd:attribute name="fieldName" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TargetValueStats">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="TargetValueStat" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TargetValueStat">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="CONTINUOUS-DISTRIBUTION-TYPES" minOccurs="1"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PairCounts">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="TargetValueCounts"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TargetValueCounts">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="TargetValueCount" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TargetValueCount">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+			<xsd:attribute name="count" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Output">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="OutputField" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="OutputField">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:sequence minOccurs="0" maxOccurs="1">
+					<xsd:element ref="Decisions" minOccurs="0" maxOccurs="1"/>
+					<xsd:group ref="EXPRESSION" minOccurs="1" maxOccurs="1"/>
+				</xsd:sequence>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="displayName" type="xsd:string"/>
+			<xsd:attribute name="optype" type="OPTYPE"/>
+			<xsd:attribute name="dataType" type="DATATYPE"/>
+			<xsd:attribute name="targetField" type="FIELD-NAME"/>
+			<xsd:attribute name="feature" type="RESULT-FEATURE" default="predictedValue"/>
+			<xsd:attribute name="value" type="xsd:string"/>
+			<xsd:attribute name="ruleFeature" type="RULE-FEATURE" default="consequent"/>
+			<xsd:attribute name="algorithm" default="exclusiveRecommendation">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="recommendation"/>
+						<xsd:enumeration value="exclusiveRecommendation"/>
+						<xsd:enumeration value="ruleAssociation"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="rank" type="INT-NUMBER" default="1"/>
+			<xsd:attribute name="rankBasis" default="confidence">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="confidence"/>
+						<xsd:enumeration value="support"/>
+						<xsd:enumeration value="lift"/>
+						<xsd:enumeration value="leverage"/>
+						<xsd:enumeration value="affinity"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="rankOrder" default="descending">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="descending"/>
+						<xsd:enumeration value="ascending"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="isMultiValued" default="0"/>
+			<xsd:attribute name="segmentId" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="RESULT-FEATURE">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="predictedValue"/>
+			<xsd:enumeration value="predictedDisplayValue"/>
+			<xsd:enumeration value="transformedValue"/>
+			<xsd:enumeration value="decision"/>
+			<xsd:enumeration value="probability"/>
+			<xsd:enumeration value="affinity"/>
+			<xsd:enumeration value="residual"/>
+			<xsd:enumeration value="standardError"/>
+			<xsd:enumeration value="clusterId"/>
+			<xsd:enumeration value="clusterAffinity"/>
+			<xsd:enumeration value="entityId"/>
+			<xsd:enumeration value="entityAffinity"/>
+			<xsd:enumeration value="warning"/>
+			<xsd:enumeration value="ruleValue"/>
+			<xsd:enumeration value="reasonCode"/>
+			<xsd:enumeration value="antecedent"/>
+			<xsd:enumeration value="consequent"/>
+			<xsd:enumeration value="rule"/>
+			<xsd:enumeration value="ruleId"/>
+			<xsd:enumeration value="confidence"/>
+			<xsd:enumeration value="support"/>
+			<xsd:enumeration value="lift"/>
+			<xsd:enumeration value="leverage"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="Decisions">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Decision" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="businessProblem" type="xsd:string"/>
+			<xsd:attribute name="description" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Decision">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+			<xsd:attribute name="displayValue" type="xsd:string"/>
+			<xsd:attribute name="description" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="RULE-FEATURE">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="antecedent"/>
+			<xsd:enumeration value="consequent"/>
+			<xsd:enumeration value="rule"/>
+			<xsd:enumeration value="ruleId"/>
+			<xsd:enumeration value="confidence"/>
+			<xsd:enumeration value="support"/>
+			<xsd:enumeration value="lift"/>
+			<xsd:enumeration value="leverage"/>
+			<xsd:enumeration value="affinity"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="GeneralRegressionModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="Extension"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element minOccurs="0" ref="Output"/>
+				<xsd:element minOccurs="0" ref="ModelStats"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element minOccurs="0" ref="Targets"/>
+				<xsd:element minOccurs="0" ref="LocalTransformations"/>
+				<xsd:element ref="ParameterList"/>
+				<xsd:element minOccurs="0" ref="FactorList"/>
+				<xsd:element minOccurs="0" ref="CovariateList"/>
+				<xsd:element ref="PPMatrix"/>
+				<xsd:element minOccurs="0" ref="PCovMatrix"/>
+				<xsd:element ref="ParamMatrix"/>
+				<xsd:element minOccurs="0" ref="EventValues"/>
+				<xsd:element minOccurs="0" ref="BaseCumHazardTables"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="targetVariableName" type="FIELD-NAME"/>
+			<xsd:attribute name="modelType" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="regression"/>
+						<xsd:enumeration value="generalLinear"/>
+						<xsd:enumeration value="multinomialLogistic"/>
+						<xsd:enumeration value="ordinalMultinomial"/>
+						<xsd:enumeration value="generalizedLinear"/>
+						<xsd:enumeration value="CoxRegression"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="targetReferenceCategory" type="xsd:string"/>
+			<xsd:attribute name="cumulativeLink" type="CUMULATIVE-LINK-FUNCTION"/>
+			<xsd:attribute name="linkFunction" type="LINK-FUNCTION"/>
+			<xsd:attribute name="linkParameter" type="REAL-NUMBER"/>
+			<xsd:attribute name="trialsVariable" type="FIELD-NAME"/>
+			<xsd:attribute name="trialsValue" type="INT-NUMBER"/>
+			<xsd:attribute name="distribution">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="binomial"/>
+						<xsd:enumeration value="gamma"/>
+						<xsd:enumeration value="igauss"/>
+						<xsd:enumeration value="negbin"/>
+						<xsd:enumeration value="normal"/>
+						<xsd:enumeration value="poisson"/>
+						<xsd:enumeration value="tweedie"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="distParameter" type="REAL-NUMBER"/>
+			<xsd:attribute name="offsetVariable" type="FIELD-NAME"/>
+			<xsd:attribute name="offsetValue" type="REAL-NUMBER"/>
+			<xsd:attribute name="modelDF" type="REAL-NUMBER"/>
+			<xsd:attribute name="endTimeVariable" type="FIELD-NAME"/>
+			<xsd:attribute name="startTimeVariable" type="FIELD-NAME"/>
+			<xsd:attribute name="subjectIDVariable" type="FIELD-NAME"/>
+			<xsd:attribute name="statusVariable" type="FIELD-NAME"/>
+			<xsd:attribute name="baselineStrataVariable" type="FIELD-NAME"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ParameterList">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Parameter" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Parameter">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="label" type="xsd:string"/>
+			<xsd:attribute name="referencePoint" type="REAL-NUMBER" default="0"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="FactorList">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="Predictor"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="CovariateList">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="Predictor"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Predictor">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Categories" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="Matrix" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="contrastMatrixType" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Categories">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Category" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Category">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PPMatrix">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="PPCell" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PPCell">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+			<xsd:attribute name="predictorName" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="parameterName" type="xsd:string" use="required"/>
+			<xsd:attribute name="targetCategory" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PCovMatrix">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element maxOccurs="unbounded" ref="PCovCell"/>
+			</xsd:sequence>
+			<xsd:attribute name="type">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="model"/>
+						<xsd:enumeration value="robust"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PCovCell">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="pRow" type="xsd:string" use="required"/>
+			<xsd:attribute name="pCol" type="xsd:string" use="required"/>
+			<xsd:attribute name="tRow" type="xsd:string"/>
+			<xsd:attribute name="tCol" type="xsd:string"/>
+			<xsd:attribute name="value" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="targetCategory" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ParamMatrix">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="PCell" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PCell">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="targetCategory" type="xsd:string"/>
+			<xsd:attribute name="parameterName" type="xsd:string" use="required"/>
+			<xsd:attribute name="beta" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="df" type="INT-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BaseCumHazardTables">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:choice>
+					<xsd:element maxOccurs="unbounded" ref="BaselineStratum"/>
+					<xsd:element maxOccurs="unbounded" ref="BaselineCell"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="maxTime" type="REAL-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BaselineStratum">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="BaselineCell"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+			<xsd:attribute name="label" type="xsd:string"/>
+			<xsd:attribute name="maxTime" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BaselineCell">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="time" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="cumHazard" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="EventValues">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="Value"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="Interval"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="CUMULATIVE-LINK-FUNCTION">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="logit"/>
+			<xsd:enumeration value="probit"/>
+			<xsd:enumeration value="cloglog"/>
+			<xsd:enumeration value="loglog"/>
+			<xsd:enumeration value="cauchit"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LINK-FUNCTION">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="cloglog"/>
+			<xsd:enumeration value="identity"/>
+			<xsd:enumeration value="log"/>
+			<xsd:enumeration value="logc"/>
+			<xsd:enumeration value="logit"/>
+			<xsd:enumeration value="loglog"/>
+			<xsd:enumeration value="negbin"/>
+			<xsd:enumeration value="oddspower"/>
+			<xsd:enumeration value="power"/>
+			<xsd:enumeration value="probit"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="ModelStats">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="UnivariateStats" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MultivariateStats" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="UnivariateStats">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Counts" minOccurs="0"/>
+				<xsd:element ref="NumericInfo" minOccurs="0"/>
+				<xsd:element ref="DiscrStats" minOccurs="0"/>
+				<xsd:element ref="ContStats" minOccurs="0"/>
+				<xsd:element ref="Anova" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME"/>
+			<xsd:attribute name="weighted" default="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="0"/>
+						<xsd:enumeration value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Counts">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="totalFreq" type="NUMBER" use="required"/>
+			<xsd:attribute name="missingFreq" type="NUMBER"/>
+			<xsd:attribute name="invalidFreq" type="NUMBER"/>
+			<xsd:attribute name="cardinality" type="xsd:nonNegativeInteger"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NumericInfo">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Quantile" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="minimum" type="NUMBER"/>
+			<xsd:attribute name="maximum" type="NUMBER"/>
+			<xsd:attribute name="mean" type="NUMBER"/>
+			<xsd:attribute name="standardDeviation" type="NUMBER"/>
+			<xsd:attribute name="median" type="NUMBER"/>
+			<xsd:attribute name="interQuartileRange" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Quantile">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="quantileLimit" type="PERCENTAGE-NUMBER" use="required"/>
+			<xsd:attribute name="quantileValue" type="NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="DiscrStats">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Array" minOccurs="0" maxOccurs="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="modalValue" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ContStats">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Interval" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="FrequenciesType" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="totalValuesSum" type="NUMBER"/>
+			<xsd:attribute name="totalSquaresSum" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="FrequenciesType">
+		<xsd:sequence>
+			<xsd:group ref="NUM-ARRAY" minOccurs="1" maxOccurs="3"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="MultivariateStats">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MultivariateStat" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="targetCategory" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="MultivariateStat">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="category" type="xsd:string"/>
+			<xsd:attribute name="exponent" type="INT-NUMBER" default="1"/>
+			<xsd:attribute name="isIntercept" type="xsd:boolean" default="false"/>
+			<xsd:attribute name="importance" type="PROB-NUMBER"/>
+			<xsd:attribute name="stdError" type="NUMBER"/>
+			<xsd:attribute name="tValue" type="NUMBER"/>
+			<xsd:attribute name="chiSquareValue" type="NUMBER"/>
+			<xsd:attribute name="fStatistic" type="NUMBER"/>
+			<xsd:attribute name="dF" type="NUMBER"/>
+			<xsd:attribute name="pValueAlpha" type="PROB-NUMBER"/>
+			<xsd:attribute name="pValueInitial" type="PROB-NUMBER"/>
+			<xsd:attribute name="pValueFinal" type="PROB-NUMBER"/>
+			<xsd:attribute name="confidenceLevel" type="PROB-NUMBER" default="0.95"/>
+			<xsd:attribute name="confidenceLowerBound" type="NUMBER"/>
+			<xsd:attribute name="confidenceUpperBound" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Anova">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="AnovaRow" minOccurs="3" maxOccurs="3"/>
+			</xsd:sequence>
+			<xsd:attribute name="target" type="FIELD-NAME"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="AnovaRow">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="type" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="Model"/>
+						<xsd:enumeration value="Error"/>
+						<xsd:enumeration value="Total"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="sumOfSquares" type="NUMBER" use="required"/>
+			<xsd:attribute name="degreesOfFreedom" type="NUMBER" use="required"/>
+			<xsd:attribute name="meanOfSquares" type="NUMBER"/>
+			<xsd:attribute name="fValue" type="NUMBER"/>
+			<xsd:attribute name="pValue" type="PROB-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Partition">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="PartitionFieldStats" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required"/>
+			<xsd:attribute name="size" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PartitionFieldStats">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Counts" minOccurs="0"/>
+				<xsd:element ref="NumericInfo" minOccurs="0"/>
+				<xsd:group ref="FrequenciesType" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="weighted" default="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="0"/>
+						<xsd:enumeration value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="EXPRESSION">
+		<xsd:choice>
+			<xsd:element ref="Constant"/>
+			<xsd:element ref="FieldRef"/>
+			<xsd:element ref="NormContinuous"/>
+			<xsd:element ref="NormDiscrete"/>
+			<xsd:element ref="Discretize"/>
+			<xsd:element ref="MapValues"/>
+			<xsd:element ref="TextIndex"/>
+			<xsd:element ref="Apply"/>
+			<xsd:element ref="Aggregate"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:element name="TransformationDictionary">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="DefineFunction" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="DerivedField" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="LocalTransformations">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="DerivedField" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="DerivedField">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="EXPRESSION"/>
+				<xsd:element ref="Value" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME"/>
+			<xsd:attribute name="displayName" type="xsd:string"/>
+			<xsd:attribute name="optype" type="OPTYPE" use="required"/>
+			<xsd:attribute name="dataType" type="DATATYPE" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Constant">
+		<xsd:complexType>
+			<xsd:simpleContent>
+				<xsd:extension base="xsd:string">
+					<xsd:attribute name="dataType" type="DATATYPE"/>
+				</xsd:extension>
+			</xsd:simpleContent>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="FieldRef">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="mapMissingTo" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NormContinuous">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="LinearNorm" minOccurs="2" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="mapMissingTo" type="NUMBER"/>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="outliers" type="OUTLIER-TREATMENT-METHOD" default="asIs"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="LinearNorm">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="orig" type="NUMBER" use="required"/>
+			<xsd:attribute name="norm" type="NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NormDiscrete">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="method" fixed="indicator">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="indicator"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+			<xsd:attribute name="mapMissingTo" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Discretize">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="DiscretizeBin" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="mapMissingTo" type="xsd:string"/>
+			<xsd:attribute name="defaultValue" type="xsd:string"/>
+			<xsd:attribute name="dataType" type="DATATYPE"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="DiscretizeBin">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Interval"/>
+			</xsd:sequence>
+			<xsd:attribute name="binValue" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="MapValues">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element minOccurs="0" maxOccurs="unbounded" ref="FieldColumnPair"/>
+				<xsd:choice minOccurs="0">
+					<xsd:element ref="TableLocator"/>
+					<xsd:element ref="InlineTable"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="mapMissingTo" type="xsd:string"/>
+			<xsd:attribute name="defaultValue" type="xsd:string"/>
+			<xsd:attribute name="outputColumn" type="xsd:string" use="required"/>
+			<xsd:attribute name="dataType" type="DATATYPE"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="FieldColumnPair">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="column" type="xsd:string" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TextIndex">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="TextIndexNormalization" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="EXPRESSION"/>
+			</xsd:sequence>
+			<xsd:attribute name="textField" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="localTermWeights" default="termFrequency">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="termFrequency"/>
+						<xsd:enumeration value="binary"/>
+						<xsd:enumeration value="logarithmic"/>
+						<xsd:enumeration value="augmentedNormalizedTermFrequency"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="isCaseSensitive" type="xsd:boolean" default="false"/>
+			<xsd:attribute name="maxLevenshteinDistance" type="xsd:integer" default="0"/>
+			<xsd:attribute name="countHits" default="allHits">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="allHits"/>
+						<xsd:enumeration value="bestHits"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="wordSeparatorCharacterRE" type="xsd:string" default="\s"/>
+			<xsd:attribute name="tokenize" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TextIndexNormalization">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:choice minOccurs="0">
+					<xsd:element ref="TableLocator"/>
+					<xsd:element ref="InlineTable"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="inField" type="xsd:string" default="string"/>
+			<xsd:attribute name="outField" type="xsd:string" default="stem"/>
+			<xsd:attribute name="regexField" type="xsd:string" default="regex"/>
+			<xsd:attribute name="recursive" type="xsd:boolean" default="false"/>
+			<xsd:attribute name="isCaseSensitive" type="xsd:boolean"/>
+			<xsd:attribute name="maxLevenshteinDistance" type="xsd:integer"/>
+			<xsd:attribute name="wordSeparatorCharacterRE" type="xsd:string"/>
+			<xsd:attribute name="tokenize" type="xsd:boolean"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Aggregate">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="function" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="count"/>
+						<xsd:enumeration value="sum"/>
+						<xsd:enumeration value="average"/>
+						<xsd:enumeration value="min"/>
+						<xsd:enumeration value="max"/>
+						<xsd:enumeration value="multiset"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="groupField" type="FIELD-NAME"/>
+			<xsd:attribute name="sqlWhere" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NeuralNetwork">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="NeuralInputs"/>
+				<xsd:element maxOccurs="unbounded" ref="NeuralLayer"/>
+				<xsd:element minOccurs="0" ref="NeuralOutputs"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="activationFunction" type="ACTIVATION-FUNCTION" use="required"/>
+			<xsd:attribute name="normalizationMethod" type="NN-NORMALIZATION-METHOD" default="none"/>
+			<xsd:attribute name="threshold" type="REAL-NUMBER" default="0"/>
+			<xsd:attribute name="width" type="REAL-NUMBER"/>
+			<xsd:attribute name="altitude" type="REAL-NUMBER" default="1.0"/>
+			<xsd:attribute name="numberOfLayers" type="xsd:nonNegativeInteger"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NeuralInputs">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element maxOccurs="unbounded" ref="NeuralInput"/>
+			</xsd:sequence>
+			<xsd:attribute name="numberOfInputs" type="xsd:nonNegativeInteger"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NeuralLayer">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element maxOccurs="unbounded" ref="Neuron"/>
+			</xsd:sequence>
+			<xsd:attribute name="numberOfNeurons" type="xsd:nonNegativeInteger"/>
+			<xsd:attribute name="activationFunction" type="ACTIVATION-FUNCTION"/>
+			<xsd:attribute name="threshold" type="REAL-NUMBER"/>
+			<xsd:attribute name="width" type="REAL-NUMBER"/>
+			<xsd:attribute name="altitude" type="REAL-NUMBER"/>
+			<xsd:attribute name="normalizationMethod" type="NN-NORMALIZATION-METHOD"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NeuralOutputs">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element maxOccurs="unbounded" ref="NeuralOutput"/>
+			</xsd:sequence>
+			<xsd:attribute name="numberOfOutputs" type="xsd:nonNegativeInteger"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="ACTIVATION-FUNCTION">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="threshold"/>
+			<xsd:enumeration value="logistic"/>
+			<xsd:enumeration value="tanh"/>
+			<xsd:enumeration value="identity"/>
+			<xsd:enumeration value="exponential"/>
+			<xsd:enumeration value="reciprocal"/>
+			<xsd:enumeration value="square"/>
+			<xsd:enumeration value="Gauss"/>
+			<xsd:enumeration value="sine"/>
+			<xsd:enumeration value="cosine"/>
+			<xsd:enumeration value="Elliott"/>
+			<xsd:enumeration value="arctan"/>
+			<xsd:enumeration value="radialBasis"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="NN-NORMALIZATION-METHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="simplemax"/>
+			<xsd:enumeration value="softmax"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="NN-NEURON-ID">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="NN-NEURON-IDREF">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:element name="NeuralInput">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="DerivedField"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="NN-NEURON-ID" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Neuron">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element maxOccurs="unbounded" ref="Con"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="NN-NEURON-ID" use="required"/>
+			<xsd:attribute name="bias" type="REAL-NUMBER"/>
+			<xsd:attribute name="width" type="REAL-NUMBER"/>
+			<xsd:attribute name="altitude" type="REAL-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Con">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="from" type="NN-NEURON-IDREF" use="required"/>
+			<xsd:attribute name="weight" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="NeuralOutput">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="DerivedField"/>
+			</xsd:sequence>
+			<xsd:attribute name="outputNeuron" type="NN-NEURON-IDREF" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BaselineModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="TestDistributions"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" use="optional" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TestDistributions">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Baseline"/>
+				<xsd:element ref="Alternate" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="testStatistic" type="BASELINE-TEST-STATISTIC" use="required"/>
+			<xsd:attribute name="resetValue" type="REAL-NUMBER" default="0.0" use="optional"/>
+			<xsd:attribute name="windowSize" type="INT-NUMBER" default="0" use="optional"/>
+			<xsd:attribute name="weightField" type="FIELD-NAME" use="optional"/>
+			<xsd:attribute name="normalizationScheme" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="BASELINE-TEST-STATISTIC">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="zValue"/>
+			<xsd:enumeration value="chiSquareIndependence"/>
+			<xsd:enumeration value="chiSquareDistribution"/>
+			<xsd:enumeration value="CUSUM"/>
+			<xsd:enumeration value="scalarProduct"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="Baseline">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:group ref="CONTINUOUS-DISTRIBUTION-TYPES" minOccurs="1"/>
+				<xsd:group ref="DISCRETE-DISTRIBUTION-TYPES" minOccurs="1"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Alternate">
+		<xsd:complexType>
+			<xsd:choice>
+				<xsd:group ref="CONTINUOUS-DISTRIBUTION-TYPES" minOccurs="1"/>
+			</xsd:choice>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="CONTINUOUS-DISTRIBUTION-TYPES">
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element ref="AnyDistribution"/>
+				<xsd:element ref="GaussianDistribution"/>
+				<xsd:element ref="PoissonDistribution"/>
+				<xsd:element ref="UniformDistribution"/>
+			</xsd:choice>
+			<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="AnyDistribution">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="mean" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="variance" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="GaussianDistribution">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="mean" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="variance" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PoissonDistribution">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="mean" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="UniformDistribution">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="lower" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="upper" type="REAL-NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="DISCRETE-DISTRIBUTION-TYPES">
+		<xsd:choice>
+			<xsd:element ref="CountTable"/>
+			<xsd:element ref="NormalizedCountTable"/>
+			<xsd:element ref="FieldRef" minOccurs="2" maxOccurs="unbounded"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:element name="CountTable" type="COUNT-TABLE-TYPE"/>
+	<xsd:element name="NormalizedCountTable" type="COUNT-TABLE-TYPE"/>
+	<xsd:complexType name="COUNT-TABLE-TYPE">
+		<xsd:sequence>
+			<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:choice>
+				<xsd:element ref="FieldValue" minOccurs="1" maxOccurs="unbounded"/>
+				<xsd:element ref="FieldValueCount" minOccurs="1" maxOccurs="unbounded"/>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute name="sample" type="NUMBER" use="optional"/>
+	</xsd:complexType>
+	<xsd:element name="FieldValue">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:choice>
+					<xsd:element ref="FieldValue" minOccurs="1" maxOccurs="unbounded"/>
+					<xsd:element ref="FieldValueCount" minOccurs="1" maxOccurs="unbounded"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="value" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="FieldValueCount">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="value" use="required"/>
+			<xsd:attribute name="count" type="NUMBER" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ModelVerification">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="VerificationFields"/>
+				<xsd:element ref="InlineTable"/>
+			</xsd:sequence>
+			<xsd:attribute name="recordCount" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="fieldCount" type="INT-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="VerificationFields">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element maxOccurs="unbounded" ref="VerificationField"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="VerificationField">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="xsd:string" use="required"/>
+			<xsd:attribute name="column" type="xsd:string" use="optional"/>
+			<xsd:attribute name="precision" type="xsd:double" default="1E-6"/>
+			<xsd:attribute name="zeroThreshold" type="xsd:double" default="1E-16"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SupportVectorMachineModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:sequence>
+					<xsd:choice>
+						<xsd:element ref="LinearKernelType"/>
+						<xsd:element ref="PolynomialKernelType"/>
+						<xsd:element ref="RadialBasisKernelType"/>
+						<xsd:element ref="SigmoidKernelType"/>
+					</xsd:choice>
+				</xsd:sequence>
+				<xsd:element ref="VectorDictionary"/>
+				<xsd:element ref="SupportVectorMachine" maxOccurs="unbounded"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="threshold" type="REAL-NUMBER" use="optional" default="0"/>
+			<xsd:attribute name="svmRepresentation" type="SVM-REPRESENTATION" use="optional" default="SupportVectors"/>
+			<xsd:attribute name="classificationMethod" type="SVM-CLASSIFICATION-METHOD" use="optional" default="OneAgainstAll"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="SVM-CLASSIFICATION-METHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="OneAgainstAll"/>
+			<xsd:enumeration value="OneAgainstOne"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SVM-REPRESENTATION">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="SupportVectors"/>
+			<xsd:enumeration value="Coefficients"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="LinearKernelType">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="description" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PolynomialKernelType">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="description" type="xsd:string" use="optional"/>
+			<xsd:attribute name="gamma" type="REAL-NUMBER" use="optional" default="1"/>
+			<xsd:attribute name="coef0" type="REAL-NUMBER" use="optional" default="1"/>
+			<xsd:attribute name="degree" type="REAL-NUMBER" use="optional" default="1"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="RadialBasisKernelType">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="description" type="xsd:string" use="optional"/>
+			<xsd:attribute name="gamma" type="REAL-NUMBER" use="optional" default="1"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SigmoidKernelType">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="description" type="xsd:string" use="optional"/>
+			<xsd:attribute name="gamma" type="REAL-NUMBER" use="optional" default="1"/>
+			<xsd:attribute name="coef0" type="REAL-NUMBER" use="optional" default="1"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="VECTOR-ID">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:element name="VectorDictionary">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="VectorFields"/>
+				<xsd:element ref="VectorInstance" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="numberOfVectors" type="INT-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="VectorFields">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="FieldRef" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="numberOfFields" type="INT-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="VectorInstance">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:choice>
+					<xsd:element ref="REAL-SparseArray"/>
+					<xsd:group ref="REAL-ARRAY"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="VECTOR-ID" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SupportVectorMachine">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="SupportVectors" minOccurs="0"/>
+				<xsd:element ref="Coefficients"/>
+			</xsd:sequence>
+			<xsd:attribute name="targetCategory" type="xsd:string" use="optional"/>
+			<xsd:attribute name="alternateTargetCategory" type="xsd:string" use="optional"/>
+			<xsd:attribute name="threshold" type="REAL-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SupportVectors">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="SupportVector" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="numberOfSupportVectors" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="numberOfAttributes" type="INT-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SupportVector">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="vectorId" type="VECTOR-ID" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Coefficients">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Coefficient" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="numberOfCoefficients" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="absoluteValue" type="REAL-NUMBER" use="optional" default="0"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Coefficient">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="REAL-NUMBER" use="optional" default="0"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Scorecard">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="Characteristics"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="initialScore" type="NUMBER" default="0"/>
+			<xsd:attribute name="useReasonCodes" type="xsd:boolean" default="true"/>
+			<xsd:attribute name="reasonCodeAlgorithm" default="pointsBelow">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="pointsAbove"/>
+						<xsd:enumeration value="pointsBelow"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="baselineScore" type="NUMBER"/>
+			<xsd:attribute name="baselineMethod" default="other">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="max"/>
+						<xsd:enumeration value="min"/>
+						<xsd:enumeration value="mean"/>
+						<xsd:enumeration value="neutral"/>
+						<xsd:enumeration value="other"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Characteristics">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Characteristic" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Characteristic">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Attribute" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME" use="optional"/>
+			<xsd:attribute name="reasonCode" type="xsd:string"/>
+			<xsd:attribute name="baselineScore" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Attribute">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="PREDICATE"/>
+				<xsd:element ref="ComplexPartialScore" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="reasonCode" type="xsd:string"/>
+			<xsd:attribute name="partialScore" type="NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ComplexPartialScore">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="EXPRESSION" minOccurs="1" maxOccurs="1"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SequenceModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="Constraints" minOccurs="0"/>
+				<xsd:element ref="Item" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Itemset" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="SetPredicate" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Sequence" maxOccurs="unbounded"/>
+				<xsd:element ref="SequenceRule" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="numberOfTransactions" type="INT-NUMBER"/>
+			<xsd:attribute name="maxNumberOfItemsPerTransaction" type="INT-NUMBER"/>
+			<xsd:attribute name="avgNumberOfItemsPerTransaction" type="REAL-NUMBER"/>
+			<xsd:attribute name="numberOfTransactionGroups" type="INT-NUMBER"/>
+			<xsd:attribute name="maxNumberOfTAsPerTAGroup" type="INT-NUMBER"/>
+			<xsd:attribute name="avgNumberOfTAsPerTAGroup" type="REAL-NUMBER"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Constraints">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="minimumNumberOfItems" type="INT-NUMBER" default="1"/>
+			<xsd:attribute name="maximumNumberOfItems" type="INT-NUMBER"/>
+			<xsd:attribute name="minimumNumberOfAntecedentItems" type="INT-NUMBER" default="1"/>
+			<xsd:attribute name="maximumNumberOfAntecedentItems" type="INT-NUMBER"/>
+			<xsd:attribute name="minimumNumberOfConsequentItems" type="INT-NUMBER" default="1"/>
+			<xsd:attribute name="maximumNumberOfConsequentItems" type="INT-NUMBER"/>
+			<xsd:attribute name="minimumSupport" type="REAL-NUMBER" default="0"/>
+			<xsd:attribute name="minimumConfidence" type="REAL-NUMBER" default="0"/>
+			<xsd:attribute name="minimumLift" type="REAL-NUMBER" default="0"/>
+			<xsd:attribute name="minimumTotalSequenceTime" type="REAL-NUMBER" default="0"/>
+			<xsd:attribute name="maximumTotalSequenceTime" type="REAL-NUMBER"/>
+			<xsd:attribute name="minimumItemsetSeparationTime" type="REAL-NUMBER" default="0"/>
+			<xsd:attribute name="maximumItemsetSeparationTime" type="REAL-NUMBER"/>
+			<xsd:attribute name="minimumAntConsSeparationTime" type="REAL-NUMBER" default="0"/>
+			<xsd:attribute name="maximumAntConsSeparationTime" type="REAL-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="ELEMENT-ID">
+		<xsd:restriction base="xsd:string"/>
+	</xsd:simpleType>
+	<xsd:element name="SetPredicate">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="STRING-ARRAY"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="ELEMENT-ID" use="required"/>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="operator" type="xsd:string" fixed="supersetOf"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="DELIMITER">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="sameTimeWindow"/>
+			<xsd:enumeration value="acrossTimeWindows"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="GAP">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="true"/>
+			<xsd:enumeration value="false"/>
+			<xsd:enumeration value="unknown"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="Delimiter">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="delimiter" type="DELIMITER" use="required"/>
+			<xsd:attribute name="gap" type="GAP" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Time">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="min" type="NUMBER"/>
+			<xsd:attribute name="max" type="NUMBER"/>
+			<xsd:attribute name="mean" type="NUMBER"/>
+			<xsd:attribute name="standardDeviation" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="FOLLOW-SET">
+		<xsd:sequence>
+			<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element ref="Delimiter"/>
+			<xsd:element ref="Time" minOccurs="0"/>
+			<xsd:element ref="SetReference"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="Sequence">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="SetReference"/>
+				<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+					<xsd:group ref="FOLLOW-SET"/>
+				</xsd:sequence>
+				<xsd:element ref="Time" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="ELEMENT-ID" use="required"/>
+			<xsd:attribute name="numberOfSets" type="INT-NUMBER"/>
+			<xsd:attribute name="occurrence" type="INT-NUMBER"/>
+			<xsd:attribute name="support" type="REAL-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SetReference">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="setId" type="ELEMENT-ID" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SequenceRule">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="AntecedentSequence"/>
+				<xsd:element ref="Delimiter"/>
+				<xsd:element ref="Time" minOccurs="0"/>
+				<xsd:element ref="ConsequentSequence"/>
+				<xsd:element ref="Time" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="ELEMENT-ID" use="required"/>
+			<xsd:attribute name="numberOfSets" type="INT-NUMBER" use="required"/>
+			<xsd:attribute name="occurrence" type="INT-NUMBER" use="required"/>
+			<xsd:attribute name="support" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="confidence" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="lift" type="REAL-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="SEQUENCE">
+		<xsd:sequence>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:element ref="SequenceReference"/>
+			<xsd:element ref="Time" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:group>
+	<xsd:element name="SequenceReference">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="seqId" type="ELEMENT-ID" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="AntecedentSequence">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="SEQUENCE"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ConsequentSequence">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="SEQUENCE"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="DataDictionary">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="DataField" maxOccurs="unbounded"/>
+				<xsd:element ref="Taxonomy" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="numberOfFields" type="xsd:nonNegativeInteger"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="DataField">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:sequence>
+					<xsd:element ref="Interval" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="Value" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="displayName" type="xsd:string"/>
+			<xsd:attribute name="optype" type="OPTYPE" use="required"/>
+			<xsd:attribute name="dataType" type="DATATYPE" use="required"/>
+			<xsd:attribute name="taxonomy" type="xsd:string"/>
+			<xsd:attribute name="isCyclic" default="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="0"/>
+						<xsd:enumeration value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="OPTYPE">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="categorical"/>
+			<xsd:enumeration value="ordinal"/>
+			<xsd:enumeration value="continuous"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DATATYPE">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="string"/>
+			<xsd:enumeration value="integer"/>
+			<xsd:enumeration value="float"/>
+			<xsd:enumeration value="double"/>
+			<xsd:enumeration value="boolean"/>
+			<xsd:enumeration value="date"/>
+			<xsd:enumeration value="time"/>
+			<xsd:enumeration value="dateTime"/>
+			<xsd:enumeration value="dateDaysSince[0]"/>
+			<xsd:enumeration value="dateDaysSince[1960]"/>
+			<xsd:enumeration value="dateDaysSince[1970]"/>
+			<xsd:enumeration value="dateDaysSince[1980]"/>
+			<xsd:enumeration value="timeSeconds"/>
+			<xsd:enumeration value="dateTimeSecondsSince[0]"/>
+			<xsd:enumeration value="dateTimeSecondsSince[1960]"/>
+			<xsd:enumeration value="dateTimeSecondsSince[1970]"/>
+			<xsd:enumeration value="dateTimeSecondsSince[1980]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="Value">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+			<xsd:attribute name="displayValue" type="xsd:string"/>
+			<xsd:attribute name="property" default="valid">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="valid"/>
+						<xsd:enumeration value="invalid"/>
+						<xsd:enumeration value="missing"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Interval">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="closure" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="openClosed"/>
+						<xsd:enumeration value="openOpen"/>
+						<xsd:enumeration value="closedOpen"/>
+						<xsd:enumeration value="closedClosed"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="leftMargin" type="NUMBER"/>
+			<xsd:attribute name="rightMargin" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TimeSeriesModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="TimeSeries" minOccurs="0" maxOccurs="3"/>
+				<xsd:element ref="SpectralAnalysis" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="ARIMA" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="ExponentialSmoothing" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="SeasonalTrendDecomposition" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="bestFit" type="TIMESERIES-ALGORITHM" use="required"/>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="TIMESERIES-ALGORITHM">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ARIMA"/>
+			<xsd:enumeration value="ExponentialSmoothing"/>
+			<xsd:enumeration value="SeasonalTrendDecomposition"/>
+			<xsd:enumeration value="SpectralAnalysis"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="TimeSeries">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="TimeAnchor" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="TimeValue" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="usage" type="TIMESERIES-USAGE" default="original"/>
+			<xsd:attribute name="startTime" type="REAL-NUMBER"/>
+			<xsd:attribute name="endTime" type="REAL-NUMBER"/>
+			<xsd:attribute name="interpolationMethod" type="INTERPOLATION-METHOD" default="none"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="TIMESERIES-USAGE">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="original"/>
+			<xsd:enumeration value="logical"/>
+			<xsd:enumeration value="prediction"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="TimeValue">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Timestamp" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+			<xsd:attribute name="index" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="time" type="NUMBER" use="optional"/>
+			<xsd:attribute name="value" type="REAL-NUMBER" use="required"/>
+			<xsd:attribute name="standardError" type="REAL-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TimeAnchor">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="TimeCycle" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="TimeException" minOccurs="0" maxOccurs="2"/>
+			</xsd:sequence>
+			<xsd:attribute name="type" type="TIME-ANCHOR"/>
+			<xsd:attribute name="offset" type="INT-NUMBER"/>
+			<xsd:attribute name="stepsize" type="INT-NUMBER"/>
+			<xsd:attribute name="displayName" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TimeCycle">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="INT-ARRAY" minOccurs="0" maxOccurs="1"/>
+			</xsd:sequence>
+			<xsd:attribute name="length" type="INT-NUMBER"/>
+			<xsd:attribute name="type" type="VALID-TIME-SPEC"/>
+			<xsd:attribute name="displayName" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="TIME-ANCHOR">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="dateTimeMillisecondsSince[0]"/>
+			<xsd:enumeration value="dateTimeMillisecondsSince[1960]"/>
+			<xsd:enumeration value="dateTimeMillisecondsSince[1970]"/>
+			<xsd:enumeration value="dateTimeMillisecondsSince[1980]"/>
+			<xsd:enumeration value="dateTimeSecondsSince[0]"/>
+			<xsd:enumeration value="dateTimeSecondsSince[1960]"/>
+			<xsd:enumeration value="dateTimeSecondsSince[1970]"/>
+			<xsd:enumeration value="dateTimeSecondsSince[1980]"/>
+			<xsd:enumeration value="dateDaysSince[0]"/>
+			<xsd:enumeration value="dateDaysSince[1960]"/>
+			<xsd:enumeration value="dateDaysSince[1970]"/>
+			<xsd:enumeration value="dateDaysSince[1980]"/>
+			<xsd:enumeration value="dateMonthsSince[0]"/>
+			<xsd:enumeration value="dateMonthsSince[1960]"/>
+			<xsd:enumeration value="dateMonthsSince[1970]"/>
+			<xsd:enumeration value="dateMonthsSince[1980]"/>
+			<xsd:enumeration value="dateYearsSince[0]"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="VALID-TIME-SPEC">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="includeAll"/>
+			<xsd:enumeration value="includeFromTo"/>
+			<xsd:enumeration value="excludeFromTo"/>
+			<xsd:enumeration value="includeSet"/>
+			<xsd:enumeration value="excludeSet"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="TimeException">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="INT-ARRAY" minOccurs="1"/>
+			</xsd:sequence>
+			<xsd:attribute name="type" type="TIME-EXCEPTION-TYPE"/>
+			<xsd:attribute name="count" type="INT-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="TIME-EXCEPTION-TYPE">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="exclude"/>
+			<xsd:enumeration value="include"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="INTERPOLATION-METHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="none"/>
+			<xsd:enumeration value="linear"/>
+			<xsd:enumeration value="exponentialSpline"/>
+			<xsd:enumeration value="cubicSpline"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="ExponentialSmoothing">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Level" minOccurs="1" maxOccurs="1"/>
+				<xsd:element ref="Trend_ExpoSmooth" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="Seasonality_ExpoSmooth" minOccurs="0" maxOccurs="1"/>
+				<xsd:element ref="TimeValue" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="RMSE" type="REAL-NUMBER"/>
+			<xsd:attribute name="transformation" default="none">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:NMTOKEN">
+						<xsd:enumeration value="none"/>
+						<xsd:enumeration value="logarithmic"/>
+						<xsd:enumeration value="squareroot"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Level">
+		<xsd:complexType>
+			<xsd:attribute name="alpha" type="REAL-NUMBER" use="optional"/>
+			<xsd:attribute name="smoothedValue" type="REAL-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Trend_ExpoSmooth">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="REAL-ARRAY" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="trend" default="additive">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:NMTOKEN">
+						<xsd:enumeration value="additive"/>
+						<xsd:enumeration value="damped_additive"/>
+						<xsd:enumeration value="multiplicative"/>
+						<xsd:enumeration value="damped_multiplicative"/>
+						<xsd:enumeration value="polynomial_exponential"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="gamma" type="REAL-NUMBER" use="optional"/>
+			<xsd:attribute name="phi" type="REAL-NUMBER" use="optional" default="1"/>
+			<xsd:attribute name="smoothedValue" type="REAL-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Seasonality_ExpoSmooth">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="REAL-ARRAY"/>
+			</xsd:sequence>
+			<xsd:attribute name="type" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:NMTOKEN">
+						<xsd:enumeration value="additive"/>
+						<xsd:enumeration value="multiplicative"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="period" type="INT-NUMBER" use="required"/>
+			<xsd:attribute name="unit" type="xsd:string" use="optional"/>
+			<xsd:attribute name="phase" type="INT-NUMBER" use="optional"/>
+			<xsd:attribute name="delta" type="REAL-NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SpectralAnalysis"/>
+	<xsd:element name="ARIMA"/>
+	<xsd:element name="SeasonalTrendDecomposition"/>
+	<xsd:element name="MiningSchema">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element maxOccurs="unbounded" ref="MiningField"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="MiningField">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="usageType" type="FIELD-USAGE-TYPE" default="active"/>
+			<xsd:attribute name="optype" type="OPTYPE"/>
+			<xsd:attribute name="importance" type="PROB-NUMBER"/>
+			<xsd:attribute name="outliers" type="OUTLIER-TREATMENT-METHOD" default="asIs"/>
+			<xsd:attribute name="lowValue" type="NUMBER"/>
+			<xsd:attribute name="highValue" type="NUMBER"/>
+			<xsd:attribute name="missingValueReplacement" type="xsd:string"/>
+			<xsd:attribute name="missingValueTreatment" type="MISSING-VALUE-TREATMENT-METHOD"/>
+			<xsd:attribute name="invalidValueTreatment" type="INVALID-VALUE-TREATMENT-METHOD" default="returnInvalid"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="FIELD-USAGE-TYPE">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="active"/>
+			<xsd:enumeration value="predicted"/>
+			<xsd:enumeration value="target"/>
+			<xsd:enumeration value="supplementary"/>
+			<xsd:enumeration value="group"/>
+			<xsd:enumeration value="order"/>
+			<xsd:enumeration value="frequencyWeight"/>
+			<xsd:enumeration value="analysisWeight"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="OUTLIER-TREATMENT-METHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="asIs"/>
+			<xsd:enumeration value="asMissingValues"/>
+			<xsd:enumeration value="asExtremeValues"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="MISSING-VALUE-TREATMENT-METHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="asIs"/>
+			<xsd:enumeration value="asMean"/>
+			<xsd:enumeration value="asMode"/>
+			<xsd:enumeration value="asMedian"/>
+			<xsd:enumeration value="asValue"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="INVALID-VALUE-TREATMENT-METHOD">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="returnInvalid"/>
+			<xsd:enumeration value="asIs"/>
+			<xsd:enumeration value="asMissing"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="ModelExplanation">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:choice>
+					<xsd:element ref="PredictiveModelQuality" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element ref="ClusteringModelQuality" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:choice>
+				<xsd:element ref="Correlations" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="PredictiveModelQuality">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="ConfusionMatrix" minOccurs="0"/>
+				<xsd:element ref="LiftData" minOccurs="0"/>
+				<xsd:element ref="ROC" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="targetField" type="xsd:string" use="required"/>
+			<xsd:attribute name="dataName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="dataUsage" default="training">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="training"/>
+						<xsd:enumeration value="test"/>
+						<xsd:enumeration value="validation"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="meanError" type="NUMBER" use="optional"/>
+			<xsd:attribute name="meanAbsoluteError" type="NUMBER" use="optional"/>
+			<xsd:attribute name="meanSquaredError" type="NUMBER" use="optional"/>
+			<xsd:attribute name="rootMeanSquaredError" type="NUMBER" use="optional"/>
+			<xsd:attribute name="r-squared" type="NUMBER" use="optional"/>
+			<xsd:attribute name="adj-r-squared" type="NUMBER" use="optional"/>
+			<xsd:attribute name="sumSquaredError" type="NUMBER" use="optional"/>
+			<xsd:attribute name="sumSquaredRegression" type="NUMBER" use="optional"/>
+			<xsd:attribute name="numOfRecords" type="NUMBER" use="optional"/>
+			<xsd:attribute name="numOfRecordsWeighted" type="NUMBER" use="optional"/>
+			<xsd:attribute name="numOfPredictors" type="NUMBER" use="optional"/>
+			<xsd:attribute name="degreesOfFreedom" type="NUMBER" use="optional"/>
+			<xsd:attribute name="fStatistic" type="NUMBER" use="optional"/>
+			<xsd:attribute name="AIC" type="NUMBER" use="optional"/>
+			<xsd:attribute name="BIC" type="NUMBER" use="optional"/>
+			<xsd:attribute name="AICc" type="NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ClusteringModelQuality">
+		<xsd:complexType>
+			<xsd:attribute name="dataName" type="xsd:string" use="optional"/>
+			<xsd:attribute name="SSE" type="NUMBER" use="optional"/>
+			<xsd:attribute name="SSB" type="NUMBER" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="LiftData">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="ModelLiftGraph"/>
+				<xsd:element ref="OptimumLiftGraph" minOccurs="0"/>
+				<xsd:element ref="RandomLiftGraph" minOccurs="0"/>
+			</xsd:sequence>
+			<xsd:attribute name="targetFieldValue" type="xsd:string"/>
+			<xsd:attribute name="targetFieldDisplayValue" type="xsd:string"/>
+			<xsd:attribute name="rankingQuality" type="NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ModelLiftGraph">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="LiftGraph"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="OptimumLiftGraph">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="LiftGraph"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="RandomLiftGraph">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="LiftGraph"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="LiftGraph">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="XCoordinates"/>
+				<xsd:element ref="YCoordinates"/>
+				<xsd:element ref="BoundaryValues" minOccurs="0"/>
+				<xsd:element ref="BoundaryValueMeans" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="XCoordinates">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="NUM-ARRAY"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="YCoordinates">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="NUM-ARRAY"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BoundaryValues">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="NUM-ARRAY"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="BoundaryValueMeans">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="NUM-ARRAY"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ROC">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="ROCGraph"/>
+			</xsd:sequence>
+			<xsd:attribute name="positiveTargetFieldValue" type="xsd:string" use="required"/>
+			<xsd:attribute name="positiveTargetFieldDisplayValue" type="xsd:string"/>
+			<xsd:attribute name="negativeTargetFieldValue" type="xsd:string"/>
+			<xsd:attribute name="negativeTargetFieldDisplayValue" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ROCGraph">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="XCoordinates"/>
+				<xsd:element ref="YCoordinates"/>
+				<xsd:element ref="BoundaryValues" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ConfusionMatrix">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="ClassLabels"/>
+				<xsd:element ref="Matrix"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ClassLabels">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="STRING-ARRAY"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Correlations">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="CorrelationFields"/>
+				<xsd:element ref="CorrelationValues"/>
+				<xsd:element ref="CorrelationMethods" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="CorrelationFields">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="STRING-ARRAY"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="CorrelationValues">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Matrix"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="CorrelationMethods">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Matrix"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="TreeModel">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="MiningSchema"/>
+				<xsd:element ref="Output" minOccurs="0"/>
+				<xsd:element ref="ModelStats" minOccurs="0"/>
+				<xsd:element ref="ModelExplanation" minOccurs="0"/>
+				<xsd:element ref="Targets" minOccurs="0"/>
+				<xsd:element ref="LocalTransformations" minOccurs="0"/>
+				<xsd:element ref="Node"/>
+				<xsd:element ref="ModelVerification" minOccurs="0"/>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="modelName" type="xsd:string"/>
+			<xsd:attribute name="functionName" type="MINING-FUNCTION" use="required"/>
+			<xsd:attribute name="algorithmName" type="xsd:string"/>
+			<xsd:attribute name="missingValueStrategy" type="MISSING-VALUE-STRATEGY" default="none"/>
+			<xsd:attribute name="missingValuePenalty" type="PROB-NUMBER" default="1.0"/>
+			<xsd:attribute name="noTrueChildStrategy" type="NO-TRUE-CHILD-STRATEGY" default="returnNullPrediction"/>
+			<xsd:attribute name="splitCharacteristic" default="multiSplit">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="binarySplit"/>
+						<xsd:enumeration value="multiSplit"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="isScorable" type="xsd:boolean" default="true"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="Node">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:group ref="PREDICATE"/>
+				<xsd:choice>
+					<xsd:sequence>
+						<xsd:element ref="Partition" minOccurs="0"/>
+						<xsd:element ref="ScoreDistribution" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element ref="Node" minOccurs="0" maxOccurs="unbounded"/>
+					</xsd:sequence>
+					<xsd:group ref="EmbeddedModel"/>
+				</xsd:choice>
+			</xsd:sequence>
+			<xsd:attribute name="id" type="xsd:string"/>
+			<xsd:attribute name="score" type="xsd:string"/>
+			<xsd:attribute name="recordCount" type="NUMBER"/>
+			<xsd:attribute name="defaultChild" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:group name="PREDICATE">
+		<xsd:choice>
+			<xsd:element ref="SimplePredicate"/>
+			<xsd:element ref="CompoundPredicate"/>
+			<xsd:element ref="SimpleSetPredicate"/>
+			<xsd:element ref="True"/>
+			<xsd:element ref="False"/>
+		</xsd:choice>
+	</xsd:group>
+	<xsd:element name="SimplePredicate">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="operator" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="equal"/>
+						<xsd:enumeration value="notEqual"/>
+						<xsd:enumeration value="lessThan"/>
+						<xsd:enumeration value="lessOrEqual"/>
+						<xsd:enumeration value="greaterThan"/>
+						<xsd:enumeration value="greaterOrEqual"/>
+						<xsd:enumeration value="isMissing"/>
+						<xsd:enumeration value="isNotMissing"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="value" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="CompoundPredicate">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:sequence minOccurs="2" maxOccurs="unbounded">
+					<xsd:group ref="PREDICATE"/>
+				</xsd:sequence>
+			</xsd:sequence>
+			<xsd:attribute name="booleanOperator" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="or"/>
+						<xsd:enumeration value="and"/>
+						<xsd:enumeration value="xor"/>
+						<xsd:enumeration value="surrogate"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="SimpleSetPredicate">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="Array"/>
+			</xsd:sequence>
+			<xsd:attribute name="field" type="FIELD-NAME" use="required"/>
+			<xsd:attribute name="booleanOperator" use="required">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="isIn"/>
+						<xsd:enumeration value="isNotIn"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="True">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="False">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="ScoreDistribution">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="value" type="xsd:string" use="required"/>
+			<xsd:attribute name="recordCount" type="NUMBER" use="required"/>
+			<xsd:attribute name="confidence" type="PROB-NUMBER"/>
+			<xsd:attribute name="probability" type="PROB-NUMBER"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="MISSING-VALUE-STRATEGY">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="lastPrediction"/>
+			<xsd:enumeration value="nullPrediction"/>
+			<xsd:enumeration value="defaultChild"/>
+			<xsd:enumeration value="weightedConfidence"/>
+			<xsd:enumeration value="aggregateNodes"/>
+			<xsd:enumeration value="none"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="NO-TRUE-CHILD-STRATEGY">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="returnNullPrediction"/>
+			<xsd:enumeration value="returnLastPrediction"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>
